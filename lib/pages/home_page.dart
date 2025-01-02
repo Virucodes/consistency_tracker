@@ -1,5 +1,6 @@
 import 'package:consistency_tracker/components/my_drawer.dart';
 import 'package:consistency_tracker/components/my_habit_tile.dart';
+import 'package:consistency_tracker/components/my_heat_map.dart';
 import 'package:consistency_tracker/database/habit_database.dart';
 import 'package:consistency_tracker/utils/habit_util.dart';
 import 'package:flutter/material.dart';
@@ -84,20 +85,22 @@ class _HomePageState extends State<HomePage> {
     textController.text = habit.name;
 
     showDialog(
-      context: context,
-       builder: (context) => AlertDialog(
-          content: TextField(
-            controller: textController,
-          ),
-          actions: [
-             //save button
+        context: context,
+        builder: (context) => AlertDialog(
+              content: TextField(
+                controller: textController,
+              ),
+              actions: [
+                //save button
                 MaterialButton(
                   onPressed: () {
                     //get a new habit
                     String newHabitName = textController.text;
 
                     //save to db
-                    context.read<HabitDatabase>().updateHabitName(habit.id, newHabitName);
+                    context
+                        .read<HabitDatabase>()
+                        .updateHabitName(habit.id, newHabitName);
 
                     //pop box
                     Navigator.pop(context);
@@ -119,29 +122,25 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: const Text("Cancel"),
                 )
-          ],
-       ));
-
-
+              ],
+            ));
   }
 
   //delete habit
   void deleteHabitBox(Habit habit) {
     showDialog(
-      context: context,
-       builder: (context) => AlertDialog(
-          content: const Text("Are you sure you want to delete?"),
-          actions: [
-             //save button
+        context: context,
+        builder: (context) => AlertDialog(
+              content: const Text("Are you sure you want to delete?"),
+              actions: [
+                //save button
                 MaterialButton(
                   onPressed: () {
-                    
                     //save to db
                     context.read<HabitDatabase>().deleteHabits(habit.id);
 
                     //pop box
                     Navigator.pop(context);
-
                   },
                   child: const Text("Delete"),
                 ),
@@ -154,8 +153,8 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: const Text("Cancel"),
                 )
-          ],
-       ));
+              ],
+            ));
   }
 
   @override
@@ -176,10 +175,44 @@ class _HomePageState extends State<HomePage> {
           color: Colors.black,
         ),
       ),
-      body: _buildHabitList(),
+      body: ListView(
+        children: [
+          //HEATMAP
+          _buildHeatMap(),
+
+          //HABITLIST
+          _buildHabitList(),
+        ],
+      ),
     );
   }
 
+  //build heat map
+  Widget _buildHeatMap() {
+    //habit database
+    final habitDatabase = context.watch<HabitDatabase>();
+
+    //current Habits
+    List<Habit> currentHabits = habitDatabase.currentHaibts;
+
+    //return heatmap UI
+    return FutureBuilder(
+        future: habitDatabase.getFirstLaunchDate(),
+        builder: (context, snapshot) {
+          //once data is available create heatmap
+          if (snapshot.hasData) {
+            return MyHeatMap(
+                startdate: snapshot.data!,
+                datasets: prepareHeatMapDataset(currentHabits));
+            
+          }
+
+          //handle case where no data available
+          return Container();
+        });
+  }
+
+  //build habit list
   Widget _buildHabitList() {
     //habit db
     final habitDatabase = context.watch<HabitDatabase>();
@@ -191,6 +224,8 @@ class _HomePageState extends State<HomePage> {
 
     return ListView.builder(
         itemCount: currentHabits.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           //get each individual habit
           final habit = currentHabits[index];
