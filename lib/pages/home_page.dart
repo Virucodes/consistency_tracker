@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
               content: TextField(
                 controller: textController,
                 decoration: const InputDecoration(
-                  hintText: "Create a New Text",
+                  hintText: "Create New Task",
                 ),
               ),
               actions: [
