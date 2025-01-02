@@ -1,5 +1,6 @@
 import 'package:consistency_tracker/database/habit_database.dart';
 import 'package:consistency_tracker/pages/home_page.dart';
+import 'package:consistency_tracker/pages/split_page.dart';
 import 'package:consistency_tracker/themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ThemeProvider>(context).themeData,
-      home: const HomePage(),
+      home: const SplitPage(),
+      routes: {
+        '/splitpage': (context) => SplitPage(),
+        '/homepage': (context) => HomePage(),
+      },
     );
   }
 }

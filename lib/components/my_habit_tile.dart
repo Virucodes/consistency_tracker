@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lottie/lottie.dart';
 
 class MyHabitTile extends StatelessWidget {
   final String text;
@@ -66,6 +67,18 @@ class MyHabitTile extends StatelessWidget {
                 onChanged: onChanged,
                 activeColor: Colors.green,
               ),
+
+               trailing:isCompleted? SizedBox(
+                  width: 20,
+                  child: Lottie.asset('assets/fire.json',width: 50,height: 50),
+              ): 
+              SizedBox(width: 0,)
+              ,
+
+             
+
+
+              
             ),
           ),
         ),
